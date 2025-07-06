@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Watch Video</title>
+  <style>
+    body {
+      background: #121218;
+      color: #f0f0f0;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 50px 20px;
+      transition: background 0.5s;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      color: #00e0ff;
+      transition: opacity 0.3s;
+    }
+
+    #video-container iframe,
+    #next-video-container iframe {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 224, 255, 0.3);
+      transition: all 0.5s ease;
+      width: 800px;
+      height: 450px;
+      max-width: 100%;
+    }
+
+    .back, .cinema-toggle {
+      display: inline-block;
+      margin: 20px 10px;
+      background-color: #3b3b5b;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    .back:hover, .cinema-toggle:hover {
+      background-color: #5c5cac;
+      transform: scale(1.05);
+    }
+
+    .cinema-mode {
+      background-color: #000 !important;
+    }
+
+    .cinema-mode #video-container iframe {
+      width: 100vw;
+      height: 80vh;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .cinema-mode h1 {
+      opacity: 0;
+      height: 0;
+      margin: 0;
+      pointer-events: none;
+    }
+
+    #next-video-container {
+      margin-top: 100px;
+      padding-top: 40px;
+      border-top: 2px solid #333;
+    }
+
+    #next-title {
+      font-size: 1.8rem;
+      color: #ffc107;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎥 Now Playing</h1>
+
+  <div id="video-container"></div>
+
+  <div>
+    <a class="back" href="index.html">🔙 Back to Menu</a>
+    <button class="cinema-toggle" onclick="toggleCinemaMode()">🍿 Toggle Cinema Mode</button>
+  </div>
+
+  <div id="next-video-container" style="display: none;">
+    <h2 id="next-title">⏭️ Next Episode</h2>
+  </div>
+
+  <script>
+    const videoList = [
+      "5qap5aO4i9A", // Lofi Girl
+      "hHW1oY26kxQ",
+      "fpnE6L0nXtI",
+      "Z9Vg6KzFWhs",
+      "4aZr5hZXP_s",
+      "1SL1nT7r0L8"
+    ];
+
+    const params = new URLSearchParams(window.location.search);
+    const videoId = params.get("vid");
+
+    const container = document.getElementById("video-container");
+    const nextContainer = document.getElementById("next-video-container");
+
+    if (videoId) {
+      const iframe = document.createElement("iframe");
+      iframe.src = `https://www.youtube.com/embed/${videoId}`;
+      iframe.allowFullscreen = true;
+      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+      iframe.title = "Current video";
+      container.appendChild(iframe);
+
+      // 🧠 Find the NEXT video in the series
+      const currentIndex = videoList.indexOf(videoId);
+      const nextId = videoList[currentIndex + 1];
+
+      if (nextId) {
+        const nextIframe = document.createElement("iframe");
+        nextIframe.src = `https://www.youtube.com/embed/${nextId}?autoplay=0`;
+        nextIframe.allowFullscreen = true;
+        nextIframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+        nextIframe.title = "Next video";
+        
+        function maybeShowNextVideo() {
+        if (
+            window.scrollY + window.innerHeight >= document.body.scrollHeight - 200 &&
+            !nextContainer.querySelector("iframe")
+        ) {
+            nextContainer.style.display = "block";
+            nextContainer.appendChild(nextIframe);
+        }
+        }
+
+        window.addEventListener("scroll", maybeShowNextVideo);
+        window.addEventListener("load", maybeShowNextVideo); // makes sure it checks even if you scrolled already
+      }
+    } else {
+      container.innerHTML = "<p>❌ No video selected.</p>";
+    }
+
+    function toggleCinemaMode() {
+      document.body.classList.toggle("cinema-mode");
+    }
+  </script>
+</body>
+</html>
