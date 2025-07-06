@@ -15,17 +15,18 @@ def generate_html_list(playlist_url, category_name, emoji="🎬"):
             print("Error: Could not extract playlist entries.")
             return
 
+        video_ids = [entry['id'] for entry in info['entries'] if entry]
+        series_param = ",".join(video_ids)
+
         print("\n--- HTML Output ---\n")
         print(f'<details id="cat-{category_name.lower().replace(" ", "-")}">')
         print(f'  <summary>{emoji} {category_name}</summary>')
         print('  <ul>')
 
-        for entry in info['entries']:
-            if not entry:
-                continue
-            video_id = entry.get('id')
+        for video_id, entry in zip(video_ids, info['entries']):
             title = entry.get('title', 'Untitled')
-            print(f'    <li><input type="checkbox" data-id="{video_id}"> <a href="video.html?vid={video_id}">{title}</a></li>')
+            print(f'    <li><input type="checkbox" data-id="{video_id}"> '
+                  f'<a href="video.html?vid={video_id}&series={series_param}">{title}</a></li>')
 
         print('  </ul>')
         print('</details>')

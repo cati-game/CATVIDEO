@@ -95,17 +95,10 @@
   </div>
 
   <script>
-    const videoList = [
-      "5qap5aO4i9A", // Lofi Girl
-      "hHW1oY26kxQ",
-      "fpnE6L0nXtI",
-      "Z9Vg6KzFWhs",
-      "4aZr5hZXP_s",
-      "1SL1nT7r0L8"
-    ];
-
     const params = new URLSearchParams(window.location.search);
     const videoId = params.get("vid");
+    const seriesParam = params.get("series");
+    const videoList = seriesParam ? seriesParam.split(",") : [];
 
     const container = document.getElementById("video-container");
     const nextContainer = document.getElementById("next-video-container");
@@ -122,26 +115,25 @@
       const currentIndex = videoList.indexOf(videoId);
       const nextId = videoList[currentIndex + 1];
 
-      if (nextId) {
-        const nextIframe = document.createElement("iframe");
-        nextIframe.src = `https://www.youtube.com/embed/${nextId}?autoplay=0`;
-        nextIframe.allowFullscreen = true;
-        nextIframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-        nextIframe.title = "Next video";
-        
+        if (nextId) {
+        const nextLink = document.createElement("a");
+        nextLink.href = `video.html?vid=${nextId}&series=${videoList.join(",")}`;
+        nextLink.textContent = "▶️ Watch Next Episode";
+        nextLink.className = "back"; // reuse same button styling
+
         function maybeShowNextVideo() {
-        if (
-            window.scrollY + window.innerHeight >= document.body.scrollHeight - 200 &&
-            !nextContainer.querySelector("iframe")
-        ) {
-            nextContainer.style.display = "block";
-            nextContainer.appendChild(nextIframe);
-        }
+            if (
+                window.scrollY + window.innerHeight >= document.body.scrollHeight - 200 &&
+                !nextContainer.querySelector("a")
+            ) {
+                nextContainer.style.display = "block";
+                nextContainer.appendChild(nextLink);
+            }
         }
 
         window.addEventListener("scroll", maybeShowNextVideo);
-        window.addEventListener("load", maybeShowNextVideo); // makes sure it checks even if you scrolled already
-      }
+        window.addEventListener("load", maybeShowNextVideo);
+        }
     } else {
       container.innerHTML = "<p>❌ No video selected.</p>";
     }
