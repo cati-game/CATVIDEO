@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Watch Video</title>
+  <title id="dynamic-title">Watching Video</title>
   <link rel="icon" type="image/png" href="images/logo.png">
   <style>
     body {
@@ -112,6 +112,17 @@
       iframe.title = "Current video";
       container.appendChild(iframe);
 
+      fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.title) {
+            document.title = data.title;
+            }
+        })
+        .catch(() => {
+            console.warn("Could not fetch video title.");
+        });
+
       // 🧠 Find the NEXT video in the series
       const currentIndex = videoList.indexOf(videoId);
       const nextId = videoList[currentIndex + 1];
@@ -142,6 +153,26 @@
     function toggleCinemaMode() {
       document.body.classList.toggle("cinema-mode");
     }
+  </script>
+    <div style="margin-top: 80px;">
+    <h2>📝 Notes</h2>
+    <textarea id="video-notes" rows="8" style="width: 100%; max-width: 800px; border-radius: 12px; padding: 10px; background: #1e1e2f; color: #fff; border: 1px solid #444; font-family: monospace;"></textarea>
+  </div>
+
+  <script>
+    const notesBox = document.getElementById("video-notes");
+    const noteKey = "notes_" + videoId;
+
+    // Load saved note
+    const savedNote = localStorage.getItem(noteKey);
+    if (savedNote) {
+      notesBox.value = savedNote;
+    }
+
+    // Save on change
+    notesBox.addEventListener("input", () => {
+      localStorage.setItem(noteKey, notesBox.value);
+    });
   </script>
 </body>
 </html>
